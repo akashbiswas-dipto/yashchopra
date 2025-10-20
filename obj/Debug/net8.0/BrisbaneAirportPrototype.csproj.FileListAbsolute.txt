@@ -1,0 +1,14 @@
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\obj\Debug\net8.0\BrisbaneAirportPrototype.GeneratedMSBuildEditorConfig.editorconfig
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\obj\Debug\net8.0\BrisbaneAirportPrototype.AssemblyInfoInputs.cache
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\obj\Debug\net8.0\BrisbaneAirportPrototype.AssemblyInfo.cs
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\obj\Debug\net8.0\BrisbaneAirportPrototype.csproj.CoreCompileInputs.cache
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\bin\Debug\net8.0\BrisbaneAirportPrototype.exe
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\bin\Debug\net8.0\BrisbaneAirportPrototype.deps.json
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\bin\Debug\net8.0\BrisbaneAirportPrototype.runtimeconfig.json
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\bin\Debug\net8.0\BrisbaneAirportPrototype.dll
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\bin\Debug\net8.0\BrisbaneAirportPrototype.pdb
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\obj\Debug\net8.0\BrisbaneAirportPrototype.dll
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\obj\Debug\net8.0\refint\BrisbaneAirportPrototype.dll
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\obj\Debug\net8.0\BrisbaneAirportPrototype.pdb
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\obj\Debug\net8.0\BrisbaneAirportPrototype.genruntimeconfig.cache
+E:\QUT\Semester 2\IFN584_OOP\assessment\BrisbaneAirportPrototype\obj\Debug\net8.0\ref\BrisbaneAirportPrototype.dll
