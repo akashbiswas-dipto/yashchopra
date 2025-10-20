@@ -14,16 +14,25 @@ namespace BrisbaneAirportSimple.Models
             PlaneId = id;
             Rows = rows;
             SeatsPerRow = seatsPerRow;
+            GenerateSeats();
+        }
 
-            // generate seats
-            for (int r = 1; r <= rows; r++)
+        void GenerateSeats()
+        {
+            Seats.Clear();
+            for (int r = 1; r <= Rows; r++)
             {
-                for (int s = 0; s < seatsPerRow; s++)
+                for (int s = 0; s < SeatsPerRow; s++)
                 {
                     char letter = (char)('A' + s);
                     Seats.Add(new Seat($"{r}{letter}"));
                 }
             }
+        }
+
+        public Seat? FindSeat(string code)
+        {
+            return Seats.Find(s => s.Code == code);
         }
     }
 }

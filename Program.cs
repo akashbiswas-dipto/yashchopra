@@ -1,8 +1,8 @@
-﻿using System;
+﻿using BrisbaneAirportSimple.Services;
+using BrisbaneAirportSimple.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using BrisbaneAirportSimple.Models;
-using BrisbaneAirportSimple.Services;
 
 namespace BrisbaneAirportSimple
 {
@@ -10,167 +10,168 @@ namespace BrisbaneAirportSimple
     {
         static void Main(string[] args)
         {
-            List<User> userlist = new List<User>();
-            List<Flight> flightlist = new List<Flight>();
-            List<Ticket> tickets = new List<Ticket>();
+            // load users from file
+            var userlist = UserFileService.LoadUsers();
+            var flightlist = new List<Flight>();
+            var tickets = new List<Ticket>();
 
-            // Add some default users
-            userlist.Add(new Traveller("Sam", 25, "sam@email.com", "0411000", "pass123"));
-            userlist.Add(new FrequentFlyer("Lena", 30, "lena@email.com", "0411222", "1234", "FF001", 100));
-            userlist.Add(new FlightManager("Maya", 35, "maya@air.com", "0411999", "mgrpass", "STAFF001"));
-
-            bool run = true;
-            User? loggedInUser = null;
-
-            while (run)
+            // seed a default manager if none (optional)
+            if (!userlist.Any(u => u is FlightManager))
             {
-                Console.WriteLine("\n=== Brisbane Airport Menu ===");
-                Console.WriteLine("1. Register");
-                Console.WriteLine("2. Login");
-                Console.WriteLine("3. View Flights");
-                Console.WriteLine("4. Book a Flight");
-                Console.WriteLine("5. Show Tickets");
-                Console.WriteLine("6. View Profile / Change Password");
-                Console.WriteLine("7. Add Flight (Flight Manager)");
-                Console.WriteLine("8. Update Flight Status (Flight Manager)");
-                Console.WriteLine("9. Logout");
-                Console.WriteLine("0. Exit");
-                Console.Write("Choose option: ");
-                string? input = Console.ReadLine();
+                var m = new FlightManager("Default Manager", 35, "manager@air.com", "0411000000", "Manager123", "STAFF001");
+                userlist.Add(m);
+                UserFileService.AppendUser(m);
+            }
 
-                switch (input)
+            Console.WriteLine("Welcome to Brisbane Airport Simple App");
+            bool running = true;
+            User? loggedIn = null;
+
+            while (running)
+            {
+                // show dynamic menu
+                Console.WriteLine();
+                if (loggedIn == null)
                 {
-                    case "1": RegisterUser(userlist); break;
-                    case "2": loggedInUser = LoginUser(userlist); break;
-                    case "3": ShowAllFlights(flightlist); break;
-                    case "4":
-                        if (loggedInUser != null)
-                        {
-                            Ticket t = BookingService.BookFlightInteractive(loggedInUser, flightlist);
-                            if (t != null) tickets.Add(t);
-                        }
-                        else Console.WriteLine("You must log in first!");
-                        break;
-                    case "5": ShowTickets(tickets); break;
-                    case "6":
-                        if (loggedInUser != null) ProfileMenu(loggedInUser);
-                        else Console.WriteLine("You must log in first!");
-                        break;
-                    case "7":
-                        if (loggedInUser is FlightManager) FlightManagerMenu(flightlist);
-                        else Console.WriteLine("Only Flight Managers can add flights.");
-                        break;
-                    case "8":
-                        if (loggedInUser is FlightManager) UpdateFlightStatus(flightlist);
-                        else Console.WriteLine("Only Flight Managers can update flights.");
-                        break;
-                    case "9": loggedInUser = null; Console.WriteLine("Logged out successfully."); break;
-                    case "0": run = false; break;
-                    default: Console.WriteLine("Invalid option!"); break;
+                    Console.WriteLine("1. Register");
+                    Console.WriteLine("2. Login");
+                    Console.WriteLine("3. Exit");
+                    Console.Write("Choose: ");
+                    var c = Console.ReadLine();
+
+                    if (c == "1") RegisterUser(userlist);
+                    else if (c == "2") loggedIn = LoginUser(userlist);
+                    else if (c == "3") running = false;
+                    else Console.WriteLine("Invalid choice");
+                }
+                else if (loggedIn is FlightManager)
+                {
+                    Console.WriteLine($"Logged in as Flight Manager: {loggedIn.Name}");
+                    Console.WriteLine("1. View Flights");
+                    Console.WriteLine("2. Add Flight");
+                    Console.WriteLine("3. Update Flight Status (delay)");
+                    Console.WriteLine("4. View Profile / Change Password");
+                    Console.WriteLine("5. Logout");
+                    Console.Write("Choose: ");
+                    var c = Console.ReadLine();
+                    if (c == "1") FlightService.ShowAllFlights(flightlist);
+                    else if (c == "2") FlightService.AddFlightInteractive(flightlist);
+                    else if (c == "3") FlightService.UpdateFlightStatusInteractive(flightlist);
+                    else if (c == "4") ProfileMenu(loggedIn, userlist);
+                    else if (c == "5") { loggedIn = null; Console.WriteLine("Logged out."); }
+                    else Console.WriteLine("Invalid choice");
+                }
+                else // Traveller or FrequentFlyer
+                {
+                    Console.WriteLine($"Logged in as: {loggedIn.Name} ({loggedIn.GetType().Name})");
+                    Console.WriteLine("1. View Flights");
+                    Console.WriteLine("2. Book a Flight");
+                    Console.WriteLine("3. View My Tickets");
+                    Console.WriteLine("4. View Profile / Change Password");
+                    Console.WriteLine("5. Logout");
+                    Console.Write("Choose: ");
+                    var c = Console.ReadLine();
+                    if (c == "1") FlightService.ShowAllFlights(flightlist);
+                    else if (c == "2")
+                    {
+                        var t = BookingService.BookFlightInteractive(loggedIn, flightlist, tickets);
+                        if (t != null) tickets.Add(t);
+                    }
+                    else if (c == "3") BookingService.ShowUserTickets(loggedIn, tickets);
+                    else if (c == "4") ProfileMenu(loggedIn, userlist);
+                    else if (c == "5") { loggedIn = null; Console.WriteLine("Logged out."); }
+                    else Console.WriteLine("Invalid choice");
                 }
             }
+
+            Console.WriteLine("Goodbye!");
         }
 
         static void RegisterUser(List<User> userlist)
         {
-            Console.Write("Name: "); string name = Console.ReadLine()!;
-            Console.Write("Age: "); int age = int.Parse(Console.ReadLine()!);
-            Console.Write("Email: "); string email = Console.ReadLine()!;
-            Console.Write("Mobile: "); string mobile = Console.ReadLine()!;
-            Console.Write("Password: "); string password = Console.ReadLine()!;
-            Console.WriteLine("Select type: 1=Traveller, 2=Frequent Flyer, 3=Flight Manager");
-            string type = Console.ReadLine()!;
+            Console.WriteLine("Register a new user");
+            Console.WriteLine("Select type: 1=Traveller 2=FrequentFlyer 3=FlightManager");
+            var t = Console.ReadLine();
 
-            User newUser;
-            if (type == "1") newUser = new Traveller(name, age, email, mobile, password);
-            else if (type == "2")
+            string name = ValidationService.ReadValidName("Name: ");
+            int age = ValidationService.ReadValidInt("Age: ", 0, 99);
+            string email = ValidationService.ReadValidEmailUnique("Email: ", userlist);
+            string mobile = ValidationService.ReadValidMobile("Mobile: ");
+            string pw = ValidationService.ReadValidPassword("Password: ");
+
+            if (t == "1")
             {
-                Console.Write("FF Number: "); string ffnum = Console.ReadLine()!;
-                Console.Write("Starting Points: "); int points = int.Parse(Console.ReadLine()!);
-                newUser = new FrequentFlyer(name, age, email, mobile, password, ffnum, points);
+                var tr = new Traveller(name, age, email, mobile, pw);
+                userlist.Add(tr);
+                UserFileService.AppendUser(tr);
+                Console.WriteLine($"Traveller {name} registered.");
             }
-            else if (type == "3")
+            else if (t == "2")
             {
-                Console.Write("Staff ID: "); string staffid = Console.ReadLine()!;
-                newUser = new FlightManager(name, age, email, mobile, password, staffid);
+                int ffnum = ValidationService.ReadValidInt("Frequent Flyer Number (100000-999999): ", 100000, 999999);
+                int pts = ValidationService.ReadValidInt("Starting points (0-1000000): ", 0, 1000000);
+                var ff = new FrequentFlyer(name, age, email, mobile, pw, ffnum, pts);
+                userlist.Add(ff);
+                UserFileService.AppendUser(ff);
+                Console.WriteLine($"FrequentFlyer {name} registered.");
+            }
+            else if (t == "3")
+            {
+                string staff = ValidationService.ReadNonEmpty("Staff ID: ");
+                var fm = new FlightManager(name, age, email, mobile, pw, staff);
+                userlist.Add(fm);
+                UserFileService.AppendUser(fm);
+                Console.WriteLine($"FlightManager {name} registered.");
             }
             else
             {
-                Console.WriteLine("Invalid type, creating Traveller by default.");
-                newUser = new Traveller(name, age, email, mobile, password);
+                Console.WriteLine("Invalid type. Registration cancelled.");
             }
-
-            userlist.Add(newUser);
-            Console.WriteLine($"User {newUser.Name} registered successfully!");
         }
 
         static User? LoginUser(List<User> userlist)
         {
-            Console.Write("Email: "); string email = Console.ReadLine()!;
-            Console.Write("Password: "); string pass = Console.ReadLine()!;
-            var user = userlist.FirstOrDefault(u => u.Email == email && u.Password == pass);
-            if (user != null) Console.WriteLine($"Welcome {user.Name}!");
-            else Console.WriteLine("Login failed!");
-            return user;
-        }
+            // reload users from file to ensure latest
+            userlist.Clear();
+            userlist.AddRange(UserFileService.LoadUsers());
 
-        static void ShowAllFlights(List<Flight> flightlist)
-        {
-            Console.WriteLine("Flights:");
-            foreach (var f in flightlist.OrderBy(f => f.ScheduledDateTime))
-                Console.WriteLine($"{f.FlightCode} to {f.City} at {f.ScheduledDateTime}, PlaneID: {f.Plane.PlaneId}, Status: {f.Status}");
-        }
+            Console.Write("Email: ");
+            var e = Console.ReadLine() ?? "";
+            Console.Write("Password: ");
+            var p = Console.ReadLine() ?? "";
 
-        static void ShowTickets(List<Ticket> tickets)
-        {
-            Console.WriteLine("Tickets:");
-            foreach (var t in tickets)
-                Console.WriteLine($"{t.User.Name} booked {t.SeatCode} on {t.Flight.FlightCode} ({t.Flight.City})");
-        }
-
-        static void ProfileMenu(User user)
-        {
-            Console.WriteLine($"--- Profile for {user.Name} ---");
-            Console.WriteLine($"Name: {user.Name}, Age: {user.Age}, Email: {user.Email}, Mobile: {user.Mobile}");
-            if (user is FrequentFlyer ff) Console.WriteLine($"FF Number: {ff.FFNumber}, Points: {ff.Points}");
-            if (user is FlightManager fm) Console.WriteLine($"Staff ID: {fm.StaffId}");
-            Console.Write("Change password? (y/n): ");
-            if (Console.ReadLine()!.ToLower() == "y")
+            var found = userlist.FirstOrDefault(u => u.Email.Equals(e, StringComparison.OrdinalIgnoreCase) && u.Password == p);
+            if (found == null)
             {
-                Console.Write("New password: "); user.Password = Console.ReadLine()!;
-                Console.WriteLine("Password updated!");
+                Console.WriteLine("Login failed - wrong email or password.");
+                return null;
             }
+            Console.WriteLine($"Welcome {found.Name}!");
+            return found;
         }
 
-        static void FlightManagerMenu(List<Flight> flightlist)
+        static void ProfileMenu(User user, List<User> userlist)
         {
-            Console.Write("Airline: "); string airline = Console.ReadLine()!;
-            Console.Write("Flight Code: "); string code = Console.ReadLine()!;
-            Console.Write("City: "); string city = Console.ReadLine()!;
-            Console.Write("Plane ID: "); string planeId = Console.ReadLine()!;
-            if (flightlist.Any(f => f.Plane.PlaneId == planeId)) { Console.WriteLine("Plane ID exists!"); return; }
-            Console.Write("Rows: "); int rows = int.Parse(Console.ReadLine()!);
-            Console.Write("Seats per row: "); int seats = int.Parse(Console.ReadLine()!);
-            Plane plane = new Plane(planeId, rows, seats);
-            Console.Write("Scheduled DateTime (yyyy-MM-dd HH:mm): "); DateTime dt = DateTime.Parse(Console.ReadLine()!);
-            Flight flight = new Flight(airline, code, city, plane, dt);
-            flightlist.Add(flight);
-            Console.WriteLine("Flight added!");
-        }
-
-        static void UpdateFlightStatus(List<Flight> flightlist)
-        {
-            ShowAllFlights(flightlist);
-            Console.Write("Flight code to update: "); string code = Console.ReadLine()!;
-            Flight? f = flightlist.FirstOrDefault(x => x.FlightCode == code);
-            if (f == null) { Console.WriteLine("Flight not found!"); return; }
-            Console.Write("New Status (On Time / Delayed): "); string status = Console.ReadLine()!;
-            f.Status = status;
-            if (status.ToLower() == "delayed")
+            Console.WriteLine("--- Profile ---");
+            Console.WriteLine(user.GetDetails());
+            if (user is FrequentFlyer ff)
             {
-                Console.Write("Delay duration in minutes: "); int delay = int.Parse(Console.ReadLine()!);
-                f.ScheduledDateTime = f.ScheduledDateTime.AddMinutes(delay);
-                Console.WriteLine($"Flight delayed by {delay} minutes!");
+                Console.WriteLine($"Frequent Flyer No: {ff.FFNumber}, Points: {ff.Points}");
+            }
+            if (user is FlightManager fm)
+            {
+                Console.WriteLine($"Staff ID: {fm.StaffId}");
+            }
+
+            Console.Write("Change password? (y/n): ");
+            var ans = Console.ReadLine();
+            if (ans != null && ans.Trim().ToLower() == "y")
+            {
+                string npw = ValidationService.ReadValidPassword("New password: ");
+                user.Password = npw;
+                // persist change to file by rewriting all users
+                UserFileService.SaveAllUsers(userlist);
+                Console.WriteLine("Password changed and saved.");
             }
         }
     }

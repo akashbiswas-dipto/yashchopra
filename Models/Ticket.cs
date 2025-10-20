@@ -1,16 +1,25 @@
-﻿namespace BrisbaneAirportSimple.Models
+﻿using System;
+
+namespace BrisbaneAirportSimple.Models
 {
     public class Ticket
     {
-        public User User;
         public Flight Flight;
+        public User Passenger;
         public string SeatCode;
+        public DateTime Issued;
 
-        public Ticket(User user, Flight flight, string seat)
+        public Ticket(User passenger, Flight flight, string seat)
         {
-            User = user;
+            Passenger = passenger;
             Flight = flight;
             SeatCode = seat;
+            Issued = DateTime.Now;
+        }
+
+        public string ShortInfo()
+        {
+            return $"{Passenger.Name} - {Flight.FlightId} - {Flight.City} - Seat {SeatCode} - {Flight.ScheduledDateTime} - Status:{Flight.Status}";
         }
     }
 }

@@ -14,9 +14,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\QUT\\Semester 2\\IFN584_OOP\\assessment\\BrisbaneAirportPrototype\\BrisbaneAirportPrototype.csproj",
-      "projectName": "BrisbaneAirportPrototype",
-      "projectPath": "E:\\QUT\\Semester 2\\IFN584_OOP\\assessment\\BrisbaneAirportPrototype\\BrisbaneAirportPrototype.csproj",
+      "projectUniqueName": "E:\\QUT\\Semester 2\\IFN584_OOP\\assessment\\BrisbaneAirportPrototype\\BrisbaneAirportSimple.csproj",
+      "projectName": "BrisbaneAirportSimple",
+      "projectPath": "E:\\QUT\\Semester 2\\IFN584_OOP\\assessment\\BrisbaneAirportPrototype\\BrisbaneAirportSimple.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
       "outputPath": "E:\\QUT\\Semester 2\\IFN584_OOP\\assessment\\BrisbaneAirportPrototype\\obj\\",
       "projectStyle": "PackageReference",
